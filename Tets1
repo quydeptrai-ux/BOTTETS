@@ -1,0 +1,43 @@
+local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+
+local function verifyKey()
+    local key = getgenv().Key
+    local discordId = getgenv().DiscordId
+    
+    if not key or not discordId then
+        Players.LocalPlayer:Kick("Missing key or Discord ID!")
+        return false
+    end
+    
+    -- Lấy IP client
+    local clientIP = game:HttpGet("https://api64.ipify.org")
+    
+    -- Gửi request đến API
+    local success, response = pcall(function()
+        return HttpService:JSONDecode(HttpService:GetAsync("http://192.168.1.9:5000/verify?key=" .. key .. "&discord=" .. discordId .. "&ip=" .. clientIP))
+    end)
+    
+    if not success then
+        Players.LocalPlayer:Kick("Failed to verify key! Server error.")
+        return false
+    end
+    
+    if not response.success then
+        Players.LocalPlayer:Kick(response.message or "Invalid key or Discord ID!")
+        return false
+    end
+    
+    if response.hwid_reset_required then
+        Players.LocalPlayer:Kick("You must reset your HWID to use the script!")
+        return false
+    end
+    
+    return true
+end
+
+if verifyKey() then
+    print("Verification successful! Loading script...")
+else
+    print("Verification failed!")
+end
