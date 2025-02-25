@@ -19,7 +19,7 @@ local function verifyKey()
     end)
     
     if not success then
-        Players.LocalPlayer:Kick("Failed to verify key! Server error.")
+        print("Catdzs1vn")
         return false
     end
     
